@@ -4,24 +4,22 @@
 	</head>
 	<body>
 		<h1>Exam</h1>
-		nom partie:
-		<input id="nom"/>
+		id hotel:
+		<input id="idHotel"/>
 		<br/>
-		id joueur1 :
-		<input id="idJoueur1"/>
-		<br/>
-		id joueur2 :
-		<input id="idJoueur2"/>
-		<br/>
-		<button onclick="start()">Envoyer</button>
-		<button onclick="stats()">Stats</button>
+		id chambre :
+		<input id="idChambre"/>
 		<br/>
 
-		<div id="content-container">
+		<button onclick="reserver()">Reserver</button>
+		<button onclick="afficher()">Afficher Chambres</button>
+		<br/>
+
+		<div id="hotel-container">
 
 		</div>
 
-		<div id="content-stats">
+		<div id="reserve-container">
 
 		</div>
 	
@@ -29,50 +27,45 @@
 
 
 		 <script>
+
+		 			// get userName by js prompt 
+
+					var userName = prompt("Please enter your name");
+
 					const socket = io.connect();
 		
-				 	function start() {
-						const nom = document.getElementById("nom").value;
-						const idJoueur1 = document.getElementById("idJoueur1").value;
-						const idJoueur2 = document.getElementById("idJoueur2").value;
+				 	function reserver() {
+						const idHotel = document.getElementById("idHotel").value;
+						const idChambre = document.getElementById("idChambre").value;
 		
-						console.log("start");	
-				 		socket.emit("add-partie", {nom: nom, joueur_1: idJoueur1, joueur_2: idJoueur2});
+						console.log("idHotel ",idHotel);	
+						console.log("idChambre ",idChambre);	
+						console.log("userName ",userName);	
+				 		socket.emit("add-reservation", {idHotel: idHotel, idChambre: idChambre, userName: userName});
 				 	}
 		
-				 	function stats() {
-						console.log("stats");
-						const nom = document.getElementById("nom").value;
-						const idJoueur1 = document.getElementById("idJoueur1").value;
-						const idJoueur2 = document.getElementById("idJoueur2").value;
-		
-				 		socket.emit("display-stats", {nom: nom, joueur_1: idJoueur1, joueur_2: idJoueur2});
+				 	function afficher() {
+						console.log("afficher");
+						const idHotel = document.getElementById("idHotel").value;
+						console.log("idHotel ",idHotel);	
+				 		socket.emit("display-chambre", {idHotel: idHotel});
 				 	}
 		
-					socket.on("stats-displayed", (data) => {
-					    console.log("stats-displayed");
-					    const container = document.getElementById("content-stats");
+					socket.on("chambre-displayed", (data) => {
+					    console.log("chambre-displayed");
+					    const container = document.getElementById("hotel-container");
 					
 					    const span1 = document.createElement("span");
-					    span1.innerText = `Round : ${data.joueur_1}`;
-					
-					    const span2 = document.createElement("span");
-					    span2.innerText = `player1 : ${JSON.stringify(data.joueur_1)}`;
-					
-					    const span3 = document.createElement("span");
-					    span3.innerText = `player2 : ${JSON.stringify(data.joueur_2)}`;
-					
+					    span1.innerText = `${JSON.stringify(data)}`;
+					   
 					    const br = document.createElement("br");
 					
 					    container.append(span1);
 						container.append(br);
-					    container.append(span2);
-						container.append(br);
-					    container.append(span3);
 					})
 		
-					socket.on("partie-added", (data) => {
-						const container = document.getElementById("content-container");
+					socket.on("reservation-added", (data) => {
+						const container = document.getElementById("reserve-container");
 						const p = document.createElement("p");
 						p.innerText = "nom: " + data.nom + " joueur1: " + data.joueur_1 + " joueur2: " + data.joueur_2;
 						container.append(p);
